@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"crypto/subtle"
 	"net/http"
 	"strings"
 
@@ -9,6 +10,15 @@ import (
 	"github.com/Yuri-NagaSaki/ImageFlow/utils/logger"
 	"go.uber.org/zap"
 )
+
+// maskAPIKey returns a masked version of the API key for safe logging
+// Shows first 4 characters followed by asterisks
+func maskAPIKey(key string) string {
+	if len(key) <= 4 {
+		return "****"
+	}
+	return key[:4] + "****"
+}
 
 // AuthResponse represents the response for API key validation
 type AuthResponse struct {
@@ -37,15 +47,15 @@ func ValidateAPIKey(cfg *config.Config) http.HandlerFunc {
 
 		providedKey := parts[1]
 
-		// Validate API key
-		if providedKey == cfg.APIKey {
+		// Validate API key using constant-time comparison to prevent timing attacks
+		if subtle.ConstantTimeCompare([]byte(providedKey), []byte(cfg.APIKey)) == 1 {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{"valid":true}`))
 			logger.Debug("API key validated successfully")
 		} else {
 			errors.WriteError(w, errors.ErrInvalidAPIKey)
 			logger.Warn("API key validation failed",
-				zap.String("provided_key", providedKey))
+				zap.String("masked_key", maskAPIKey(providedKey)))
 		}
 	}
 }
@@ -57,8 +67,9 @@ func RequireAPIKey(cfg *config.Config, next http.HandlerFunc) http.HandlerFunc {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
 			errors.WriteError(w, errors.ErrInvalidAPIKey)
-			logger.Warn("缺少API密钥",
-				zap.String("path", r.URL.Path))
+			logger.Warn("Missing API key",
+				zap.String("path", r.URL.Path),
+				zap.String("method", r.Method))
 			return
 		}
 
@@ -66,19 +77,20 @@ func RequireAPIKey(cfg *config.Config, next http.HandlerFunc) http.HandlerFunc {
 		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 || parts[0] != "Bearer" {
 			errors.WriteError(w, errors.ErrInvalidAPIKey)
-			logger.Warn("无效的Authorization头",
+			logger.Warn("Invalid Authorization header format",
 				zap.String("path", r.URL.Path),
-				zap.String("auth_header", authHeader))
+				zap.String("method", r.Method))
 			return
 		}
 
-		// Validate API key
+		// Validate API key using constant-time comparison to prevent timing attacks
 		providedKey := parts[1]
-		if providedKey != cfg.APIKey {
+		if subtle.ConstantTimeCompare([]byte(providedKey), []byte(cfg.APIKey)) != 1 {
 			errors.WriteError(w, errors.ErrInvalidAPIKey)
-			logger.Warn("API密钥验证失败",
+			logger.Warn("API key validation failed",
 				zap.String("path", r.URL.Path),
-				zap.String("provided_key", providedKey))
+				zap.String("method", r.Method),
+				zap.String("masked_key", maskAPIKey(providedKey)))
 			return
 		}
 

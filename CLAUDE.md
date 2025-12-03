@@ -8,7 +8,7 @@ ImageFlow is a modern image service system that provides efficient image managem
 
 ## Architecture
 
-### Backend (Go 1.22+)
+### Backend (Go 1.23+)
 - **Main Service**: HTTP server with CORS middleware and graceful shutdown
 - **Image Processing**: Uses libvips (via bimg) for high-performance image conversion to WebP/AVIF
 - **Storage**: Supports both local filesystem and S3-compatible storage
@@ -108,20 +108,26 @@ The service is configured via environment variables in `.env` file:
 ### Image Processing
 - `MAX_UPLOAD_COUNT`: Max images per upload request (default: 20)
 - `IMAGE_QUALITY`: Conversion quality 1-100 (default: 80)
-- `WORKER_THREADS`: Parallel processing threads (default: 4)
-- `SPEED`: Encoding speed 0-8 (default: 5)
+- `WORKER_THREADS`: Parallel processing threads for libvips (default: 4)
+- `WORKER_POOL_SIZE`: Size of worker pool for concurrent image processing (default: 4)
+- `SPEED`: Encoding speed 0-8, where 0=slowest/highest quality (default: 5)
+
+### Server Settings
+- `ALLOWED_ORIGINS`: Comma-separated list of allowed CORS origins (default: `*`)
+- `DEBUG_MODE`: Enable debug logging (default: false)
 
 ## API Endpoints
 
 ### Public Endpoints
 - `GET /api/random` - Get random image with advanced filtering options:
   - `tag=tag1` or `tags=tag1,tag2,tag3` - Filter by tags (AND logic for multiple tags)
-  - `exclude=nsfw,private` - Exclude images with specified tags 
+  - `exclude=nsfw,private` - Exclude images with specified tags
   - `orientation=portrait|landscape` - Force specific orientation (overrides device detection)
   - `format=avif|webp|original` - Prefer specific image format
   - Device-based orientation: Mobile devices get portrait by default, desktop gets landscape
   - Example: `/api/random?tags=nature,sunset&exclude=nsfw&orientation=landscape&format=webp`
 - `POST /api/validate-api-key` - Validate API key
+- `GET /api/random?tag=healthcheck` - Health check endpoint (used by Docker)
 
 ### Authenticated Endpoints (require API key header)
 - `POST /api/upload` - Upload images with optional expiry and tags
@@ -169,8 +175,33 @@ The service is configured via environment variables in `.env` file:
 
 ## Prerequisites
 
-- Go 1.22+ for backend development
-- Node.js 18+ for frontend development  
+- Go 1.23+ for backend development
+- Node.js 18+ for frontend development
 - libvips development libraries for image processing
 - Redis (optional but recommended for metadata storage)
 - Docker and Docker Compose for containerized deployment
+
+## Image Storage Structure
+
+Images are organized in a specific directory structure for orientation and format optimization:
+```
+{IMAGE_BASE_PATH}/
+├── original/
+│   ├── landscape/    # Original landscape images
+│   └── portrait/     # Original portrait images
+├── landscape/
+│   ├── webp/         # WebP converted landscape
+│   └── avif/         # AVIF converted landscape
+├── portrait/
+│   ├── webp/         # WebP converted portrait
+│   └── avif/         # AVIF converted portrait
+└── gif/              # GIF files (not converted)
+```
+
+## Key Implementation Details
+
+- **Format Selection**: Browser Accept headers determine format (AVIF > WebP > Original)
+- **GIF Handling**: GIF files are preserved without conversion to maintain animation
+- **PNG Transparency**: PNG files served as original when `format=original` to preserve transparency
+- **Metadata Storage**: Redis stores image metadata with tag indexing for efficient filtering
+- **Worker Pool**: Image conversions are queued and processed asynchronously via worker pool
