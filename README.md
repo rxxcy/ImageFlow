@@ -1,284 +1,372 @@
 # ImageFlow
+
 <div align="center">
 
-[![English Document](https://img.shields.io/badge/-English%20Document-6366f1?logo=readthedocs&style=flat-square&logoColor=white)](README.md)
-|
-[![部署说明](https://img.shields.io/badge/-%E9%83%A8%E7%BD%B2%E8%AF%B4%E6%98%8E-6366f1?logo=docker&style=flat-square&logoColor=white)](https://catcat.blog/imageflow-install.html)
-|
-[![贡献指南](https://img.shields.io/badge/-%E8%B4%A1%E7%8C%AE%E6%8C%87%E5%8D%97-6366f1?logo=github&style=flat-square&logoColor=white)](contributing.md)
-|
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Yuri-NagaSaki/ImageFlow)
-</div>
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/soyorins/imageflow-backend)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Go](https://img.shields.io/badge/Go-1.23+-00ADD8?logo=go&logoColor=white)](https://go.dev/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+
+**A modern image management and distribution platform with automatic format optimization**
 
 [English](README.md) | [中文文档](README_CN.md)
 
-ImageFlow is a full-stack image management platform that automatically optimizes images for different devices and browsers, while providing powerful filtering and distribution capabilities.
+</div>
 
-## ✨ Features
+---
 
-### 🚀 **Core Capabilities**
-- **Smart Image Conversion**: Automatic WebP/AVIF generation with libvips for optimal performance
-- **Device-Aware Serving**: Intelligent orientation detection (portrait for mobile, landscape for desktop)
-- **Advanced Random API**: Multi-tag filtering, exclusion rules, and format preferences
-- **Dual Storage Support**: Local filesystem or S3-compatible storage
-- **Real-time Processing**: Background worker pool for async image conversion
+## Introduction
 
-### 🎯 **Advanced Filtering**
-- **Multi-tag Combinations**: AND logic for precise content selection
-- **Exclusion Filters**: Prevent NSFW or private content from public APIs
-- **Orientation Control**: Force landscape/portrait regardless of device
-- **Format Negotiation**: Client-aware format selection (AVIF > WebP > Original)
+ImageFlow is a full-stack image management platform that automatically optimizes images for different devices and browsers. It combines a high-performance Go backend with a modern Next.js frontend to provide intelligent image conversion, device-aware serving, and powerful filtering capabilities.
 
-### 🛡️ **Security & Privacy**
-- **API Key Authentication**: Secure upload and management endpoints
-- **Smart Defaults**: Auto-exclude sensitive content from random API
-- **Expiry Management**: Automatic cleanup of expired images
-- **Metadata Protection**: Redis-based metadata with file fallback
+## Architecture
 
-### 🎨 **Modern Frontend**
-- **Next.js 14**: App Router with TypeScript and Tailwind CSS
-- **Drag & Drop**: Intuitive file upload with batch processing
-- **Dark Mode**: Beautiful UI that adapts to user preferences
-- **Responsive Design**: Works perfectly on all device sizes
+```mermaid
+graph TB
+    subgraph Client["Client Layer"]
+        Browser["Web Browser"]
+        APIClient["API Client"]
+    end
 
-## 🏃‍♂️ Quick Start
+    subgraph Frontend["Frontend Container :3000"]
+        NextJS["Next.js 14<br/>TypeScript + Tailwind CSS<br/>App Router"]
+    end
 
-### Using Docker (Recommended)
+    subgraph Backend["Backend Container :8686"]
+        GoServer["Go HTTP Server"]
+        ImageProc["Image Processor<br/>libvips"]
+        WorkerPool["Worker Pool<br/>Async Processing"]
+    end
+
+    subgraph Storage["Storage Layer"]
+        Redis[("Redis<br/>Metadata Store")]
+        LocalFS["Local Filesystem"]
+        S3["S3 Compatible<br/>Storage"]
+    end
+
+    Browser --> NextJS
+    APIClient --> GoServer
+    NextJS --> GoServer
+    GoServer --> ImageProc
+    GoServer --> WorkerPool
+    WorkerPool --> ImageProc
+    GoServer --> Redis
+    GoServer --> LocalFS
+    GoServer --> S3
+```
+
+### Component Overview
+
+| Component | Technology | Description |
+|-----------|------------|-------------|
+| Frontend | Next.js 14, TypeScript, Tailwind CSS | Modern web interface with drag-and-drop upload |
+| Backend | Go 1.23+, libvips | High-performance image processing server |
+| Metadata | Redis | Fast metadata storage with tag indexing |
+| Storage | Local / S3 | Flexible storage backend options |
+
+## Features
+
+### Image Processing
+
+- Automatic conversion to WebP and AVIF formats
+- High-performance processing powered by libvips
+- Configurable quality and compression settings
+- Background worker pool for async processing
+- GIF preservation (maintains animation)
+
+### Intelligent Distribution
+
+- Device-aware orientation detection (portrait for mobile, landscape for desktop)
+- Browser-based format negotiation (AVIF > WebP > Original)
+- Multi-tag filtering with AND logic
+- Exclusion filters for sensitive content
+- Forced orientation override option
+
+### Storage Options
+
+- Local filesystem storage
+- S3-compatible object storage (AWS S3, MinIO, Cloudflare R2, etc.)
+- Organized directory structure by orientation and format
+
+### Security
+
+- API key authentication for management endpoints
+- Automatic cleanup of expired images
+- Configurable CORS policies
+- Sensitive content auto-exclusion from public APIs
+
+### Modern Frontend
+
+- Next.js 14 with App Router
+- Drag-and-drop batch upload
+- Dark mode support
+- Responsive masonry layout
+- Real-time upload progress
+
+## Deployment
+
+### Prerequisites
+
+- Docker and Docker Compose installed
+- Minimum 1GB RAM recommended
+- Sufficient disk space for image storage
+
+### Quick Start
 
 ```bash
 # Clone the repository
 git clone https://github.com/Yuri-NagaSaki/ImageFlow.git
 cd ImageFlow
 
-# Start with Docker Compose
-docker-compose up -d
-
-# Your ImageFlow instance is now running at http://localhost:8080
-```
-
-### Manual Installation
-
-#### Prerequisites
-- **Go 1.22+**
-- **Node.js 18+**
-- **libvips** (for image processing)
-- **Redis** (optional but recommended)
-
-#### Backend Setup
-
-```bash
-# Install Go dependencies
-go mod tidy
-
-# Configure environment
+# Create configuration file
 cp .env.example .env
-# Edit .env with your settings
 
-# Build and run
-go build -o imageflow
-./imageflow
-```
+# Edit configuration (see Configuration section below)
+nano .env
 
-#### Frontend Setup
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Development
-npm run dev
-
-# Production build
-npm run build
-```
-
-## 🔧 Configuration
-
-Create a `.env` file in the project root:
-
-```bash
-# API Keys
-API_KEY=your_api_key_here
-
-# Storage Configuration
-STORAGE_TYPE=s3 # Options: local, s3
-METADATA_STORE_TYPE=redis
-LOCAL_STORAGE_PATH=static/images
-
-# Redis Configuration
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=
-REDIS_DB=0
-REDIS_TLS_ENABLED=false
-
-# S3 Configuration
-S3_ENDPOINT=
-S3_REGION=
-S3_ACCESS_KEY=
-S3_SECRET_KEY=
-S3_BUCKET=
-CUSTOM_DOMAIN=
-
-# Upload and Conversion Settings
-# Maximum number of images allowed in a single upload (Need Self build default: 20)
-# Image quality for WebP/AVIF conversion (1-100, default: 80)
-# Number of parallel worker threads for batch processing (default: 4)
-# SPEED: Range: 0-8, 0=slowest/highest quality, 8=fastest/lowest quality
-# Size of worker pool for concurrent image processing (default: 4)
-MAX_UPLOAD_COUNT=20
-IMAGE_QUALITY=75
-WORKER_THREADS=4
-SPEED=5
-WORKER_POOL_SIZE=4
-
-# Frontend Configuration Only for Docker
-# if you just want export static site, you can set below to empty
-# NEXT_PUBLIC_API_URL=http://localhost:8686
-
-NEXT_PUBLIC_API_URL=
-
-# Remote patterns for Next.js Image component (comma-separated)
-# Examples:
-# Single domain: example.com
-# Multiple domains: example.com,cdn.example.com
-# With protocol: https://example.com,http://cdn.example.com
-NEXT_PUBLIC_REMOTE_PATTERNS=
-
-# Debug Mode
-DEBUG_MODE=false
-```
-
-## 📚 API Usage
-
-### Random Image API
-
-The crown jewel of ImageFlow - get perfectly filtered random images:
-
-```bash
-# Basic random image
-GET /api/random?tag=nature
-
-# Advanced filtering
-GET /api/random?tags=nature,landscape&exclude=nsfw&orientation=landscape&format=webp
-
-# Mobile-optimized
-GET /api/random?tag=wallpaper&orientation=portrait
-```
-
-### Upload API
-
-```bash
-curl -X POST "https://your-domain.com/api/upload" \
-  -H "Authorization: Bearer your-api-key" \
-  -F "images[]=@photo1.jpg" \
-  -F "images[]=@photo2.png" \
-  -F "tags=nature,landscape" \
-  -F "expiryMinutes=1440"
-```
-
-### Management API
-
-```bash
-# List images with filtering
-GET /api/images?page=1&tag=nature&orientation=landscape
-
-# Delete image
-POST /api/delete-image
-Content-Type: application/json
-{"id": "image-uuid"}
-
-# Get all tags
-GET /api/tags
-```
-
-For complete API documentation, see [API_USAGE_GUIDE.md](API_USAGE_GUIDE.md).
-
-## 🏗️ Architecture
-
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Next.js 14   │    │    Go Backend    │    │  Storage Layer  │
-│                 │    │                  │    │                 │
-│ • TypeScript    │◄──►│ • Fiber HTTP     │◄──►│ • Local Files   │
-│ • Tailwind CSS  │    │ • libvips        │    │ • S3 Compatible │
-│ • App Router    │    │ • Worker Pool    │    │ • Redis Cache   │
-│ • Static Export │    │ • Auto Formats   │    │ • Metadata      │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-```
-
-### Key Components
-
-- **Image Processor**: libvips-powered conversion engine
-- **Worker Pool**: Async processing for optimal performance  
-- **Metadata Manager**: Redis + file-based dual storage
-- **Smart Router**: Device-aware content delivery
-- **Security Layer**: API key auth + intelligent filtering
-
-## 🚀 Deployment
-
-### Single Container (Recommended)
-
-```bash
-docker-compose up -d
-```
-
-### Separated Services
-
-```bash
-# Frontend and backend as separate containers
+# Start all services
 docker-compose -f docker-compose-separate.yaml up -d
 ```
 
-## 🔨 Development
+After deployment:
+- Frontend: `http://localhost:3000`
+- Backend API: `http://localhost:8686`
 
-### Project Structure
+### Service Architecture
+
+The deployment includes three containers:
+
+| Service | Port | Description |
+|---------|------|-------------|
+| imageflow-frontend | 3000 | Next.js web interface |
+| imageflow-backend | 8686 | Go API server |
+| imageflow-redis | 6379 | Metadata storage |
+
+## Configuration
+
+Create a `.env` file in the project root with the following settings:
+
+### Core Settings
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `API_KEY` | Yes | - | Authentication key for upload/management APIs |
+| `STORAGE_TYPE` | No | `local` | Storage backend: `local` or `s3` |
+| `LOCAL_STORAGE_PATH` | No | `static/images` | Path for local image storage |
+| `DEBUG_MODE` | No | `false` | Enable debug logging |
+
+### Redis Configuration
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `METADATA_STORE_TYPE` | No | `redis` | Metadata storage type |
+| `REDIS_HOST` | No | `localhost` | Redis server hostname |
+| `REDIS_PORT` | No | `6379` | Redis server port |
+| `REDIS_PASSWORD` | No | - | Redis authentication password |
+| `REDIS_DB` | No | `0` | Redis database number |
+| `REDIS_TLS_ENABLED` | No | `false` | Enable TLS for Redis connection |
+
+### S3 Configuration (when STORAGE_TYPE=s3)
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `S3_ENDPOINT` | Yes | - | S3 endpoint URL |
+| `S3_REGION` | Yes | - | S3 region |
+| `S3_ACCESS_KEY` | Yes | - | S3 access key |
+| `S3_SECRET_KEY` | Yes | - | S3 secret key |
+| `S3_BUCKET` | Yes | - | S3 bucket name |
+| `CUSTOM_DOMAIN` | No | - | Custom domain for S3 assets |
+
+### Image Processing
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `MAX_UPLOAD_COUNT` | No | `20` | Maximum images per upload request |
+| `IMAGE_QUALITY` | No | `80` | Conversion quality (1-100) |
+| `WORKER_THREADS` | No | `4` | libvips parallel processing threads |
+| `WORKER_POOL_SIZE` | No | `4` | Concurrent image processing workers |
+| `SPEED` | No | `5` | Encoding speed (0=slowest/best, 8=fastest) |
+
+### Frontend Configuration
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `NEXT_PUBLIC_API_URL` | No | - | Backend API URL for frontend |
+| `NEXT_PUBLIC_REMOTE_PATTERNS` | No | - | Allowed image domains (comma-separated) |
+
+### Example Configuration
+
+```bash
+# Core
+API_KEY=your-secure-api-key-here
+STORAGE_TYPE=local
+DEBUG_MODE=false
+
+# Redis
+METADATA_STORE_TYPE=redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+# Image Processing
+IMAGE_QUALITY=80
+WORKER_THREADS=4
+WORKER_POOL_SIZE=4
+MAX_UPLOAD_COUNT=20
+
+# Frontend 
+NEXT_PUBLIC_API_URL=http://backend:8686
+NEXT_PUBLIC_REMOTE_PATTERNS=http://backend:8686,https://s3.url
+```
+
+## API Reference
+
+### Public Endpoints
+
+#### Get Random Image
+
+```http
+GET /api/random
+```
+
+Query Parameters:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `tag` | string | Filter by single tag |
+| `tags` | string | Filter by multiple tags (comma-separated, AND logic) |
+| `exclude` | string | Exclude images with these tags (comma-separated) |
+| `orientation` | string | Force orientation: `portrait` or `landscape` |
+| `format` | string | Preferred format: `avif`, `webp`, or `original` |
+
+Examples:
+
+```bash
+# Basic random image
+curl "http://localhost:8686/api/random"
+
+# Filter by tags
+curl "http://localhost:8686/api/random?tags=nature,landscape"
+
+# Exclude sensitive content
+curl "http://localhost:8686/api/random?tag=wallpaper&exclude=nsfw,private"
+
+# Force portrait orientation
+curl "http://localhost:8686/api/random?orientation=portrait&format=webp"
+```
+
+### Authenticated Endpoints
+
+All management endpoints require the `Authorization` header:
+
+```
+Authorization: Bearer your-api-key
+```
+
+#### Upload Images
+
+```http
+POST /api/upload
+Content-Type: multipart/form-data
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `images[]` | file | Image files to upload (multiple allowed) |
+| `tags` | string | Comma-separated tags |
+| `expiryMinutes` | number | Auto-delete after N minutes (optional) |
+
+#### List Images
+
+```http
+GET /api/images
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `page` | number | Page number |
+| `tag` | string | Filter by tag |
+| `orientation` | string | Filter by orientation |
+
+#### Delete Image
+
+```http
+POST /api/delete-image
+Content-Type: application/json
+
+{"id": "image-uuid"}
+```
+
+#### Get All Tags
+
+```http
+GET /api/tags
+```
+
+#### Get Configuration
+
+```http
+GET /api/config
+```
+
+## Project Structure
 
 ```
 ImageFlow/
 ├── main.go                 # Application entry point
 ├── config/                 # Configuration management
 ├── handlers/               # HTTP request handlers
-│   ├── random.go          # Advanced random image API
-│   ├── upload.go          # Multi-file upload handler
-│   └── *.go               # Other API endpoints
+│   ├── auth.go            # Authentication middleware
+│   ├── upload.go          # Image upload handler
+│   ├── random.go          # Random image API
+│   ├── list.go            # Image listing
+│   ├── delete.go          # Image deletion
+│   └── tags.go            # Tag management
 ├── utils/                  # Core utilities
 │   ├── converter_bimg.go  # libvips image processing
-│   ├── redis.go           # Metadata and caching
+│   ├── storage.go         # Storage interface
+│   ├── redis.go           # Redis operations
 │   ├── worker_pool.go     # Async processing
-│   └── *.go               # Storage, auth, etc.
+│   └── cleaner.go         # Expired image cleanup
 ├── frontend/              # Next.js application
-│   ├── app/               # App Router structure
-│   │   ├── components/    # React components
-│   │   ├── hooks/         # Custom hooks
-│   │   └── utils/         # Frontend utilities
-│   └── package.json       # Dependencies
-├── static/                # Generated assets
-└── docker-compose*.yaml   # Deployment configs
+│   ├── app/               # App Router pages
+│   ├── components/        # React components
+│   └── utils/             # Frontend utilities
+├── docker-compose-separate.yaml  # Docker deployment (frontend + backend)
+├── Dockerfile             # Backend container
+├── Dockerfile.frontend    # Frontend container
+└── .env.example           # Configuration template
 ```
 
-## 📄 License
+## Image Storage Structure
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```
+static/images/
+├── original/
+│   ├── landscape/         # Original landscape images
+│   └── portrait/          # Original portrait images
+├── landscape/
+│   ├── webp/              # WebP converted landscape
+│   └── avif/              # AVIF converted landscape
+├── portrait/
+│   ├── webp/              # WebP converted portrait
+│   └── avif/              # AVIF converted portrait
+└── gif/                   # GIF files (preserved)
+```
 
-## 🙏 Acknowledgments
+## License
 
-- **libvips** - High-performance image processing
-- **Redis** - Lightning-fast metadata storage
-- **Next.js** - Amazing React framework
-- **Fiber** - Express-inspired Go web framework
-- **Tailwind CSS** - Utility-first CSS framework
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## 📞 Support
+## Acknowledgments
 
-- 📖 [Documentation](API_USAGE_GUIDE.md)
-- 🐛 [Report Issues](https://github.com/Yuri-NagaSaki/ImageFlow/issues)
-- 💬 [Discussions](https://github.com/Yuri-NagaSaki/ImageFlow/discussions)
+- [libvips](https://github.com/libvips/libvips) - High-performance image processing library
+- [bimg](https://github.com/h2non/bimg) - Go bindings for libvips
+- [Next.js](https://nextjs.org/) - React framework for production
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Redis](https://redis.io/) - In-memory data store
 
----
+## Support
 
-**Made with ❤️ by the catcat.blog team**
-
-*Transform your image workflow today!*
+- [Documentation](API_USAGE_GUIDE.md)
+- [Report Issues](https://github.com/Yuri-NagaSaki/ImageFlow/issues)
+- [Discussions](https://github.com/Yuri-NagaSaki/ImageFlow/discussions)
