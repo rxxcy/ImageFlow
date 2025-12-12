@@ -384,6 +384,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Support
 
-- [Documentation](API_USAGE_GUIDE.md)
 - [Report Issues](https://github.com/Yuri-NagaSaki/ImageFlow/issues)
 - [Discussions](https://github.com/Yuri-NagaSaki/ImageFlow/discussions)

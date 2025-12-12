@@ -67,18 +67,6 @@ docker-compose up -d
 docker-compose -f docker-compose.build.yaml up --build -d
 ```
 
-### Database Migration
-```bash
-# Migrate metadata from files to Redis
-bash migrate.sh
-
-# Force migration
-bash migrate.sh --force
-
-# Specify custom .env file
-bash migrate.sh --env /path/to/.env
-```
-
 ## Configuration
 
 The service is configured via environment variables in `.env` file:

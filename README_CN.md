@@ -384,6 +384,5 @@ static/images/
 
 ## 支持
 
-- [文档](API_USAGE_GUIDE.md)
 - [报告问题](https://github.com/Yuri-NagaSaki/ImageFlow/issues)
 - [讨论](https://github.com/Yuri-NagaSaki/ImageFlow/discussions)
