@@ -1,11 +1,14 @@
+<div align="center">
+
 # ImageFlow
 
-<div align="center">
+<img src="favicon/favicon.svg" alt="ImageFlow Logo" width="120" height="120">
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/soyorins/imageflow-backend)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Go](https://img.shields.io/badge/Go-1.23+-00ADD8?logo=go&logoColor=white)](https://go.dev/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Yuri-NagaSaki/ImageFlow)
 
 **A modern image management and distribution platform with automatic format optimization**
 
@@ -18,6 +21,16 @@
 ## Introduction
 
 ImageFlow is a full-stack image management platform that automatically optimizes images for different devices and browsers. It combines a high-performance Go backend with a modern Next.js frontend to provide intelligent image conversion, device-aware serving, and powerful filtering capabilities.
+
+## Preview
+
+<div align="center">
+<img src="docs/img/image1.webp" alt="ImageFlow Preview 1" width="80%">
+<img src="docs/img/image2.webp" alt="ImageFlow Preview 2" width="80%">
+<img src="docs/img/image3.webp" alt="ImageFlow Preview 3" width="80%">
+<img src="docs/img/image4.webp" alt="ImageFlow Preview 4" width="80%">
+<img src="docs/img/image5.webp" alt="ImageFlow Preview 5" width="80%">
+</div>
 
 ## Architecture
 

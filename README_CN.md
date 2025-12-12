@@ -1,11 +1,14 @@
+<div align="center">
+
 # ImageFlow
 
-<div align="center">
+<img src="favicon/favicon.svg" alt="ImageFlow Logo" width="120" height="120">
 
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://hub.docker.com/r/soyorins/imageflow-backend)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Go](https://img.shields.io/badge/Go-1.23+-00ADD8?logo=go&logoColor=white)](https://go.dev/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Yuri-NagaSaki/ImageFlow)
 
 **现代化图片管理与分发平台，支持自动格式优化**
 
@@ -18,6 +21,16 @@
 ## 简介
 
 ImageFlow 是一个全栈图片管理平台，能够自动为不同设备和浏览器优化图片。它结合了高性能的 Go 后端和现代化的 Next.js 前端，提供智能图片转换、设备感知服务和强大的过滤功能。
+
+## 预览
+
+<div align="center">
+<img src="docs/img/image1.webp" alt="ImageFlow Preview 1" width="80%">
+<img src="docs/img/image2.webp" alt="ImageFlow Preview 2" width="80%">
+<img src="docs/img/image3.webp" alt="ImageFlow Preview 3" width="80%">
+<img src="docs/img/image4.webp" alt="ImageFlow Preview 4" width="80%">
+<img src="docs/img/image5.webp" alt="ImageFlow Preview 5" width="80%">
+</div>
 
 ## 系统架构
 
