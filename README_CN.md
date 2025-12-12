@@ -138,7 +138,7 @@ cp .env.example .env
 nano .env
 
 # 启动所有服务
-docker-compose -f docker-compose-separate.yaml up -d
+docker-compose up -d
 ```
 
 部署完成后：
@@ -344,8 +344,8 @@ ImageFlow/
 │   ├── app/               # App Router 页面
 │   ├── components/        # React 组件
 │   └── utils/             # 前端工具
-├── docker-compose-separate.yaml  # Docker 部署配置（前后端分离）
-├── Dockerfile             # 后端容器
+├── docker-compose.yaml    # Docker 部署配置
+├── Dockerfile.backend     # 后端容器
 ├── Dockerfile.frontend    # 前端容器
 └── .env.example           # 配置模板
 ```

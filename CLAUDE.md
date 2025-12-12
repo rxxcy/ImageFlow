@@ -18,7 +18,7 @@ ImageFlow is a modern image service system that provides efficient image managem
 
 ### Frontend (Next.js 14)
 - **App Router**: Modern Next.js with TypeScript and Tailwind CSS
-- **Static Export**: Built as static site and embedded in Go binary
+- **Server-Side Rendering**: Runs as a separate Next.js server
 - **Components**: React components with drag-and-drop upload, masonry layout, and dark mode
 - **Device Detection**: Automatic landscape/portrait image selection
 
@@ -40,7 +40,7 @@ go build -o imageflow
 go mod tidy
 ```
 
-### Frontend Development  
+### Frontend Development
 ```bash
 # Navigate to frontend directory
 cd frontend
@@ -51,27 +51,17 @@ npm install
 # Development server
 npm run dev
 
-# Build for production (static export)
+# Build for production
 npm run build
 
 # Lint frontend code
 npm run lint
-
-# Build frontend (using build script)
-bash build.sh    # Linux/Mac
-build.bat        # Windows
 ```
 
 ### Docker Deployment
 ```bash
-# Backend-only deployment (embedded frontend)
+# Start all services (frontend + backend + redis)
 docker-compose up -d
-
-# Frontend-backend separated (pre-built images)
-docker-compose -f docker-compose-separate.yaml up -d
-
-# Frontend-backend separated (local build)
-docker-compose -f docker-compose-separate-build.yaml up --build -d
 ```
 
 ### Database Migration
@@ -159,11 +149,11 @@ The service is configured via environment variables in `.env` file:
 │   │   ├── components/ # React components
 │   │   ├── hooks/     # Custom React hooks
 │   │   └── utils/     # Frontend utilities
-│   ├── package.json   # Frontend dependencies
-│   └── build.sh       # Frontend build script
-├── static/            # Generated static files and image storage
+│   └── package.json   # Frontend dependencies
 ├── logs/              # Application logs
-└── docker-compose*.yaml  # Docker deployment configurations
+├── docker-compose.yaml    # Docker deployment configuration
+├── Dockerfile.backend     # Backend container
+└── Dockerfile.frontend    # Frontend container
 ```
 
 ## Development Workflow

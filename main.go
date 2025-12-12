@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"mime"
 	"net/http"
 	"os"
 	"os/signal"
@@ -125,9 +124,6 @@ func main() {
 	utils.InitCleaner(cfg)
 	logger.Info("Image cleaner started")
 
-	// Configure MIME types
-	configureMIMETypes()
-
 	// Create routes
 	http.HandleFunc("/api/validate-api-key", handlers.ValidateAPIKey(cfg))
 	http.HandleFunc("/api/upload", handlers.RequireAPIKey(cfg, handlers.UploadHandler(cfg)))
@@ -165,52 +161,6 @@ func main() {
 		}
 		http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir(cfg.ImageBasePath))))
 	}
-
-	// Serve static files
-	fs := http.FileServer(http.Dir("static"))
-
-	// Next.js static assets
-	http.Handle("/_next/", http.StripPrefix("/_next/", http.FileServer(http.Dir("static/_next"))))
-
-	// Static assets
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
-
-	// Favicon files
-	faviconServer := http.FileServer(http.Dir("favicon"))
-	http.Handle("/favicon-16.png", faviconServer)
-	http.Handle("/favicon-32.png", faviconServer)
-	http.Handle("/favicon-48.png", faviconServer)
-	http.Handle("/favicon.ico", faviconServer)
-	http.Handle("/favicon.svg", faviconServer)
-
-	// Text files
-	http.HandleFunc("/index.txt", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "static/index.txt")
-	})
-	http.HandleFunc("/manage.txt", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "static/manage.txt")
-	})
-
-	// Serve upload and management pages
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/":
-			http.ServeFile(w, r, "static/index.html")
-		case "/manage":
-			http.ServeFile(w, r, "static/manage.html")
-		default:
-			filePath := filepath.Join("static", r.URL.Path)
-			if !filepath.IsAbs(filePath) {
-				http.NotFound(w, r)
-				return
-			}
-			if _, err := os.Stat(filePath); err == nil {
-				http.ServeFile(w, r, filePath)
-			} else {
-				http.NotFound(w, r)
-			}
-		}
-	})
 
 	// Create HTTP server
 	server := &http.Server{
@@ -263,20 +213,6 @@ func main() {
 
 	close(done)
 	logger.Info("Server shutdown completed")
-}
-
-// configureMIMETypes registers common MIME types
-func configureMIMETypes() {
-	// Register common MIME types
-	mime.AddExtensionType(".css", "text/css")
-	mime.AddExtensionType(".js", "application/javascript")
-	mime.AddExtensionType(".svg", "image/svg+xml")
-	mime.AddExtensionType(".ico", "image/x-icon")
-	mime.AddExtensionType(".png", "image/png")
-	mime.AddExtensionType(".jpg", "image/jpeg")
-	mime.AddExtensionType(".jpeg", "image/jpeg")
-	mime.AddExtensionType(".webp", "image/webp")
-	mime.AddExtensionType(".avif", "image/avif")
 }
 
 // ensureDirectories creates necessary directory structure for images

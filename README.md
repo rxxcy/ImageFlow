@@ -138,7 +138,7 @@ cp .env.example .env
 nano .env
 
 # Start all services
-docker-compose -f docker-compose-separate.yaml up -d
+docker-compose up -d
 ```
 
 After deployment:
@@ -344,8 +344,8 @@ ImageFlow/
 │   ├── app/               # App Router pages
 │   ├── components/        # React components
 │   └── utils/             # Frontend utilities
-├── docker-compose-separate.yaml  # Docker deployment (frontend + backend)
-├── Dockerfile             # Backend container
+├── docker-compose.yaml    # Docker deployment
+├── Dockerfile.backend     # Backend container
 ├── Dockerfile.frontend    # Frontend container
 └── .env.example           # Configuration template
 ```

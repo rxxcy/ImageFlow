@@ -11,12 +11,8 @@ if (fs.existsSync(parentEnvPath)) {
   }
 }
 
-/** @type {boolean} */
-const isStaticExport = !process.env.NEXT_PUBLIC_API_URL;
-
 const parseRemotePatterns = (patterns) => {
-  if (!patterns || isStaticExport) {
-    console.log('isStaticExport:', isStaticExport);
+  if (!patterns) {
     return undefined;
   }
 
@@ -43,9 +39,7 @@ const remotePatterns = parseRemotePatterns(process.env.NEXT_PUBLIC_REMOTE_PATTER
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  output: isStaticExport ? 'export' : undefined,
   images: {
-    unoptimized: isStaticExport,
     remotePatterns: remotePatterns
   },
   optimizeFonts: true,
