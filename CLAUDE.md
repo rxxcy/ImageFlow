@@ -60,8 +60,11 @@ npm run lint
 
 ### Docker Deployment
 ```bash
-# Start all services (frontend + backend + redis)
+# Start all services using pre-built images
 docker-compose up -d
+
+# Or build locally for development/testing
+docker-compose -f docker-compose.build.yaml up --build -d
 ```
 
 ### Database Migration
@@ -151,9 +154,10 @@ The service is configured via environment variables in `.env` file:
 │   │   └── utils/     # Frontend utilities
 │   └── package.json   # Frontend dependencies
 ├── logs/              # Application logs
-├── docker-compose.yaml    # Docker deployment configuration
-├── Dockerfile.backend     # Backend container
-└── Dockerfile.frontend    # Frontend container
+├── docker-compose.yaml       # Docker deployment (pre-built images)
+├── docker-compose.build.yaml # Docker deployment (local build)
+├── Dockerfile.backend        # Backend container
+└── Dockerfile.frontend       # Frontend container
 ```
 
 ## Development Workflow

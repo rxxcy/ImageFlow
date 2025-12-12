@@ -137,8 +137,11 @@ cp .env.example .env
 # Edit configuration (see Configuration section below)
 nano .env
 
-# Start all services
+# Start all services (using pre-built images)
 docker-compose up -d
+
+# Or build locally for development/testing
+docker-compose -f docker-compose.build.yaml up --build -d
 ```
 
 After deployment:
@@ -344,9 +347,10 @@ ImageFlow/
 │   ├── app/               # App Router pages
 │   ├── components/        # React components
 │   └── utils/             # Frontend utilities
-├── docker-compose.yaml    # Docker deployment
-├── Dockerfile.backend     # Backend container
-├── Dockerfile.frontend    # Frontend container
+├── docker-compose.yaml       # Docker deployment (pre-built images)
+├── docker-compose.build.yaml # Docker deployment (local build)
+├── Dockerfile.backend        # Backend container
+├── Dockerfile.frontend       # Frontend container
 └── .env.example           # Configuration template
 ```
 

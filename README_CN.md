@@ -137,8 +137,11 @@ cp .env.example .env
 # 编辑配置（参见下方配置说明）
 nano .env
 
-# 启动所有服务
+# 启动所有服务（使用预构建镜像）
 docker-compose up -d
+
+# 或本地构建用于开发/测试
+docker-compose -f docker-compose.build.yaml up --build -d
 ```
 
 部署完成后：
@@ -344,9 +347,10 @@ ImageFlow/
 │   ├── app/               # App Router 页面
 │   ├── components/        # React 组件
 │   └── utils/             # 前端工具
-├── docker-compose.yaml    # Docker 部署配置
-├── Dockerfile.backend     # 后端容器
-├── Dockerfile.frontend    # 前端容器
+├── docker-compose.yaml       # Docker 部署（预构建镜像）
+├── docker-compose.build.yaml # Docker 部署（本地构建）
+├── Dockerfile.backend        # 后端容器
+├── Dockerfile.frontend       # 前端容器
 └── .env.example           # 配置模板
 ```
 
