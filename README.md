@@ -99,30 +99,56 @@ npm run build
 Create a `.env` file in the project root:
 
 ```bash
-# Required Settings
-API_KEY=your-secure-api-key-here
-STORAGE_TYPE=local  # or 's3'
+# API Keys
+API_KEY=your_api_key_here
+
+# Storage Configuration
+STORAGE_TYPE=s3 # Options: local, s3
+METADATA_STORE_TYPE=redis
 LOCAL_STORAGE_PATH=static/images
 
-# Redis Configuration (Optional but Recommended)
-REDIS_ENABLED=true
+# Redis Configuration
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=
+REDIS_DB=0
+REDIS_TLS_ENABLED=false
 
-# S3 Configuration (if STORAGE_TYPE=s3)
-S3_ENDPOINT=https://s3.amazonaws.com
-S3_REGION=us-east-1
-S3_BUCKET=your-bucket-name
-S3_ACCESS_KEY=your-access-key
-S3_SECRET_KEY=your-secret-key
-CUSTOM_DOMAIN=https://cdn.yourdomain.com
+# S3 Configuration
+S3_ENDPOINT=
+S3_REGION=
+S3_ACCESS_KEY=
+S3_SECRET_KEY=
+S3_BUCKET=
+CUSTOM_DOMAIN=
 
-# Image Processing
+# Upload and Conversion Settings
+# Maximum number of images allowed in a single upload (Need Self build default: 20)
+# Image quality for WebP/AVIF conversion (1-100, default: 80)
+# Number of parallel worker threads for batch processing (default: 4)
+# SPEED: Range: 0-8, 0=slowest/highest quality, 8=fastest/lowest quality
+# Size of worker pool for concurrent image processing (default: 4)
 MAX_UPLOAD_COUNT=20
-IMAGE_QUALITY=80
+IMAGE_QUALITY=75
 WORKER_THREADS=4
 SPEED=5
+WORKER_POOL_SIZE=4
+
+# Frontend Configuration Only for Docker
+# if you just want export static site, you can set below to empty
+# NEXT_PUBLIC_API_URL=http://localhost:8686
+
+NEXT_PUBLIC_API_URL=
+
+# Remote patterns for Next.js Image component (comma-separated)
+# Examples:
+# Single domain: example.com
+# Multiple domains: example.com,cdn.example.com
+# With protocol: https://example.com,http://cdn.example.com
+NEXT_PUBLIC_REMOTE_PATTERNS=
+
+# Debug Mode
+DEBUG_MODE=false
 ```
 
 ## 📚 API Usage
