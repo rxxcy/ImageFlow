@@ -14,6 +14,8 @@
 
 [English](README.md) | [中文文档](README_CN.md)
 
+> **需要 Serverless 版本？** 查看 [CattoPic](https://github.com/Yuri-NagaSaki/CattoPic) - ImageFlow 的 Cloudflare Workers 无服务器实现。
+
 </div>
 
 ---

@@ -14,6 +14,8 @@
 
 [English](README.md) | [中文文档](README_CN.md)
 
+> **Looking for a Serverless version?** Check out [CattoPic](https://github.com/Yuri-NagaSaki/CattoPic) - ImageFlow's serverless implementation for Cloudflare Workers.
+
 </div>
 
 ---
